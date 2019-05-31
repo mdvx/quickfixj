@@ -27,6 +27,7 @@ import javax.swing.table.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.math.BigDecimal;
 
 public class OrderTable extends JTable implements MouseListener {
     private final transient BanzaiApplication application;
@@ -40,7 +41,7 @@ public class OrderTable extends JTable implements MouseListener {
     public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
         Order order = ((OrderTableModel) dataModel).getOrder(row);
 
-        int open = order.getOpen();
+        BigDecimal open = order.getOpen();
         double executed = order.getExecuted();
         boolean rejected = order.getRejected();
         boolean canceled = order.getCanceled();
@@ -52,11 +53,11 @@ public class OrderTable extends JTable implements MouseListener {
             r.setBackground(Color.red);
         else if (canceled)
             r.setBackground(Color.white);
-        else if (open == 0 && executed == 0.0)
+        else if (open.compareTo(BigDecimal.ZERO) == 0 && executed == 0.0)
             r.setBackground(Color.yellow);
-        else if (open > 0)
+        else if (open.compareTo(BigDecimal.ZERO) > 0)
             r.setBackground(Color.green);
-        else if (open == 0)
+        else if (open.compareTo(BigDecimal.ZERO) == 0)
             r.setBackground(Color.white);
 
         return super.prepareRenderer(renderer, row, column);

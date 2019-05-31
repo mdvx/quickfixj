@@ -21,11 +21,13 @@ package quickfix.examples.banzai;
 
 import quickfix.SessionID;
 
+import java.math.BigDecimal;
+
 public class Order implements Cloneable {
     private SessionID sessionID = null;
     private String symbol = null;
-    private int quantity = 0;
-    private int open = 0;
+    private BigDecimal quantity = BigDecimal.ZERO;
+    private BigDecimal open = BigDecimal.ZERO;
     private double executed = 0;
     private OrderSide side = OrderSide.BUY;
     private OrderType type = OrderType.MARKET;
@@ -79,19 +81,19 @@ public class Order implements Cloneable {
         this.symbol = symbol;
     }
 
-    public int getQuantity() {
+    public BigDecimal getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
     }
 
-    public int getOpen() {
+    public BigDecimal getOpen() {
         return open;
     }
 
-    public void setOpen(int open) {
+    public void setOpen(BigDecimal open) {
         this.open = open;
     }
 

@@ -144,6 +144,8 @@ public class BanzaiApplication implements Application {
                         executionReport(message, sessionID);
                     } else if (message.getHeader().getField(msgType).valueEquals("9")) {
                         cancelReject(message, sessionID);
+                    } else if (message.getHeader().getField(msgType).valueEquals("j")) {
+                        JOptionPane.showMessageDialog(null, message.toString());
                     } else {
                         sendBusinessReject(message, BusinessRejectReason.UNSUPPORTED_MESSAGE_TYPE,
                                 "Unsupported Message Type");
@@ -213,11 +215,11 @@ public class BanzaiApplication implements Application {
             // > FIX 4.1
             LeavesQty leavesQty = new LeavesQty();
             message.getField(leavesQty);
-            fillSize = new BigDecimal(order.getQuantity()).subtract(new BigDecimal("" + leavesQty.getValue()));
+            fillSize = order.getQuantity().subtract(new BigDecimal("" + leavesQty.getValue()));
         }
 
         if (fillSize.compareTo(BigDecimal.ZERO) > 0) {
-            order.setOpen(order.getOpen() - (int) Double.parseDouble(fillSize.toPlainString()));
+            order.setOpen(order.getOpen().subtract(new BigDecimal(fillSize.toPlainString())));
             order.setExecuted(Double.parseDouble(message.getString(CumQty.FIELD)));
             order.setAvgPx(Double.parseDouble(message.getString(AvgPx.FIELD)));
         }
@@ -226,11 +228,11 @@ public class BanzaiApplication implements Application {
 
         if (ordStatus.valueEquals(OrdStatus.REJECTED)) {
             order.setRejected(true);
-            order.setOpen(0);
+            order.setOpen(BigDecimal.ZERO);
         } else if (ordStatus.valueEquals(OrdStatus.CANCELED)
                 || ordStatus.valueEquals(OrdStatus.DONE_FOR_DAY)) {
             order.setCanceled(true);
-            order.setOpen(0);
+            order.setOpen(BigDecimal.ZERO);
         } else if (ordStatus.valueEquals(OrdStatus.NEW)) {
             if (order.isNew()) {
                 order.setNew(false);
@@ -326,7 +328,7 @@ public class BanzaiApplication implements Application {
     public void send40(Order order) {
         quickfix.fix40.NewOrderSingle newOrderSingle = new quickfix.fix40.NewOrderSingle(
                 new ClOrdID(order.getID()), new HandlInst('1'), new Symbol(order.getSymbol()),
-                sideToFIXSide(order.getSide()), new OrderQty(order.getQuantity()),
+                sideToFIXSide(order.getSide()), new OrderQty(order.getQuantity().doubleValue()),
                 typeToFIXType(order.getType()));
 
         send(populateOrder(order, newOrderSingle), order.getSessionID());
@@ -336,7 +338,7 @@ public class BanzaiApplication implements Application {
         quickfix.fix41.NewOrderSingle newOrderSingle = new quickfix.fix41.NewOrderSingle(
                 new ClOrdID(order.getID()), new HandlInst('1'), new Symbol(order.getSymbol()),
                 sideToFIXSide(order.getSide()), typeToFIXType(order.getType()));
-        newOrderSingle.set(new OrderQty(order.getQuantity()));
+        newOrderSingle.set(new OrderQty(order.getQuantity().doubleValue()));
 
         send(populateOrder(order, newOrderSingle), order.getSessionID());
     }
@@ -345,7 +347,7 @@ public class BanzaiApplication implements Application {
         quickfix.fix42.NewOrderSingle newOrderSingle = new quickfix.fix42.NewOrderSingle(
                 new ClOrdID(order.getID()), new HandlInst('1'), new Symbol(order.getSymbol()),
                 sideToFIXSide(order.getSide()), new TransactTime(), typeToFIXType(order.getType()));
-        newOrderSingle.set(new OrderQty(order.getQuantity()));
+        newOrderSingle.set(new OrderQty(order.getQuantity().doubleValue()));
 
         send(populateOrder(order, newOrderSingle), order.getSessionID());
     }
@@ -354,7 +356,7 @@ public class BanzaiApplication implements Application {
         quickfix.fix43.NewOrderSingle newOrderSingle = new quickfix.fix43.NewOrderSingle(
                 new ClOrdID(order.getID()), new HandlInst('1'), sideToFIXSide(order.getSide()),
                 new TransactTime(), typeToFIXType(order.getType()));
-        newOrderSingle.set(new OrderQty(order.getQuantity()));
+        newOrderSingle.set(new OrderQty(order.getQuantity().doubleValue()));
         newOrderSingle.set(new Symbol(order.getSymbol()));
         send(populateOrder(order, newOrderSingle), order.getSessionID());
     }
@@ -363,7 +365,7 @@ public class BanzaiApplication implements Application {
         quickfix.fix44.NewOrderSingle newOrderSingle = new quickfix.fix44.NewOrderSingle(
                 new ClOrdID(order.getID()), sideToFIXSide(order.getSide()),
                 new TransactTime(), typeToFIXType(order.getType()));
-        newOrderSingle.set(new OrderQty(order.getQuantity()));
+        newOrderSingle.set(new OrderQty(order.getQuantity().doubleValue()));
         newOrderSingle.set(new Symbol(order.getSymbol()));
         newOrderSingle.set(new HandlInst('1'));
         send(populateOrder(order, newOrderSingle), order.getSessionID());
@@ -373,7 +375,7 @@ public class BanzaiApplication implements Application {
         quickfix.fix50.NewOrderSingle newOrderSingle = new quickfix.fix50.NewOrderSingle(
                 new ClOrdID(order.getID()), sideToFIXSide(order.getSide()),
                 new TransactTime(), typeToFIXType(order.getType()));
-        newOrderSingle.set(new OrderQty(order.getQuantity()));
+        newOrderSingle.set(new OrderQty(order.getQuantity().doubleValue()));
         newOrderSingle.set(new Symbol(order.getSymbol()));
         newOrderSingle.set(new HandlInst('1'));
         send(populateOrder(order, newOrderSingle), order.getSessionID());
@@ -421,7 +423,7 @@ public class BanzaiApplication implements Application {
         quickfix.fix40.OrderCancelRequest message = new quickfix.fix40.OrderCancelRequest(
                 new OrigClOrdID(order.getID()), new ClOrdID(id), new CxlType(CxlType.FULL_REMAINING_QUANTITY), new Symbol(order
                         .getSymbol()), sideToFIXSide(order.getSide()), new OrderQty(order
-                        .getQuantity()));
+                        .getQuantity().doubleValue()));
 
         orderTableModel.addID(order, id);
         send(message, order.getSessionID());
@@ -432,7 +434,7 @@ public class BanzaiApplication implements Application {
         quickfix.fix41.OrderCancelRequest message = new quickfix.fix41.OrderCancelRequest(
                 new OrigClOrdID(order.getID()), new ClOrdID(id), new Symbol(order.getSymbol()),
                 sideToFIXSide(order.getSide()));
-        message.setField(new OrderQty(order.getQuantity()));
+        message.setField(new OrderQty(order.getQuantity().doubleValue()));
 
         orderTableModel.addID(order, id);
         send(message, order.getSessionID());
@@ -443,7 +445,7 @@ public class BanzaiApplication implements Application {
         quickfix.fix42.OrderCancelRequest message = new quickfix.fix42.OrderCancelRequest(
                 new OrigClOrdID(order.getID()), new ClOrdID(id), new Symbol(order.getSymbol()),
                 sideToFIXSide(order.getSide()), new TransactTime());
-        message.setField(new OrderQty(order.getQuantity()));
+        message.setField(new OrderQty(order.getQuantity().doubleValue()));
 
         orderTableModel.addID(order, id);
         send(message, order.getSessionID());
@@ -468,7 +470,7 @@ public class BanzaiApplication implements Application {
         quickfix.fix40.OrderCancelReplaceRequest message = new quickfix.fix40.OrderCancelReplaceRequest(
                 new OrigClOrdID(order.getID()), new ClOrdID(newOrder.getID()), new HandlInst('1'),
                 new Symbol(order.getSymbol()), sideToFIXSide(order.getSide()), new OrderQty(
-                        newOrder.getQuantity()), typeToFIXType(order.getType()));
+                        newOrder.getQuantity().doubleValue()), typeToFIXType(order.getType()));
 
         orderTableModel.addID(order, newOrder.getID());
         send(populateCancelReplace(order, newOrder, message), order.getSessionID());
@@ -497,7 +499,7 @@ public class BanzaiApplication implements Application {
     Message populateCancelReplace(Order order, Order newOrder, quickfix.Message message) {
 
         if (order.getQuantity() != newOrder.getQuantity())
-            message.setField(new OrderQty(newOrder.getQuantity()));
+            message.setField(new OrderQty(newOrder.getQuantity().doubleValue()));
         if (!order.getLimit().equals(newOrder.getLimit()))
             message.setField(new Price(newOrder.getLimit()));
         return message;

@@ -30,6 +30,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.math.BigDecimal;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -54,14 +55,14 @@ import quickfix.examples.banzai.OrderType;
 
 @SuppressWarnings("unchecked")
 public class OrderEntryPanel extends JPanel implements Observer {
-    private boolean symbolEntered = false;
-    private boolean quantityEntered = false;
-    private boolean limitEntered = false;
+    private boolean symbolEntered = true;
+    private boolean quantityEntered = true;
+    private boolean limitEntered = true;
     private boolean stopEntered = false;
     private boolean sessionEntered = false;
 
     private final JTextField symbolTextField = new JTextField();
-    private final IntegerNumberTextField quantityTextField = new IntegerNumberTextField();
+    private final DoubleNumberTextField quantityTextField = new DoubleNumberTextField();
 
     private final JComboBox sideComboBox = new JComboBox(OrderSide.toArray());
     private final JComboBox typeComboBox = new JComboBox(OrderType.toArray());
@@ -98,9 +99,15 @@ public class OrderEntryPanel extends JPanel implements Observer {
         stopPriceTextField.addKeyListener(activator);
         sessionComboBox.addItemListener(activator);
 
+
+
         setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
         setLayout(new GridBagLayout());
         createComponents();
+
+        symbolTextField.setText("LTC/USD");
+        quantityTextField.setText("0.1");
+        limitPriceTextField.setText("100");
     }
 
     public void addActionListener(ActionListener listener) {
@@ -247,7 +254,7 @@ public class OrderEntryPanel extends JPanel implements Observer {
             order.setTIF((OrderTIF) tifComboBox.getSelectedItem());
 
             order.setSymbol(symbolTextField.getText());
-            order.setQuantity(Integer.parseInt(quantityTextField.getText()));
+            order.setQuantity(new BigDecimal(quantityTextField.getText()));
             order.setOpen(order.getQuantity());
 
             OrderType type = order.getType();
