@@ -34,6 +34,8 @@ public class OrderTableModel extends AbstractTableModel {
     private final static int STOPPRICE = 7;
     private final static int AVGPX = 8;
     private final static int TARGET = 9;
+    private final static int CLIENTID = 10;
+    private final static int ID = 11;
 
     private final HashMap<Integer, Order> rowToOrder;
     private final HashMap<String, Integer> idToRow;
@@ -49,7 +51,7 @@ public class OrderTableModel extends AbstractTableModel {
         headers = new String[]
                   {"Symbol", "Quantity", "Open", "Executed",
                    "Side", "Type", "Limit", "Stop", "AvgPx",
-                   "Target"};
+                   "Target", "ClientId", "Id"};
     }
 
     public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -147,6 +149,10 @@ public class OrderTableModel extends AbstractTableModel {
             return order.getAvgPx();
         case TARGET:
             return order.getSessionID().getTargetCompID();
+        case CLIENTID:
+            return order.getClientID();
+        case ID:
+            return order.getID();
         }
         return "";
     }

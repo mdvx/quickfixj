@@ -355,6 +355,8 @@ public class BanzaiApplication implements Application {
 
         OrderType type = order.getType();
 
+        newOrderSingle.setField(new ClOrdID(order.getClientID()));
+
         if (type == OrderType.LIMIT)
             newOrderSingle.setField(new Price(order.getLimit()));
         else if (type == OrderType.STOP) {
@@ -424,15 +426,15 @@ public class BanzaiApplication implements Application {
         send(message, order.getSessionID());
     }
     public void cancel44(Order order) {
-        String id = order.generateID();
+
         quickfix.fix44.OrderCancelRequest message = new quickfix.fix44.OrderCancelRequest(
-                new OrigClOrdID(order.getID()), new ClOrdID(id),
+                new OrigClOrdID(order.getID()), new ClOrdID(order.getClientID()),
                 sideToFIXSide(order.getSide()), new TransactTime());
         message.setField(new OrderID(order.getID()));
         message.setField(new OrderQty(order.getQuantity().doubleValue()));
         message.setField(new Symbol(order.getSymbol()));
 
-        orderTableModel.addID(order, id);
+        orderTableModel.addID(order, order.getClientID());
         send(message, order.getSessionID());
     }
 

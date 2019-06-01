@@ -22,6 +22,7 @@ package quickfix.examples.banzai;
 import quickfix.SessionID;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public class Order implements Cloneable {
     private SessionID sessionID = null;
@@ -41,10 +42,12 @@ public class Order implements Cloneable {
     private String message = null;
     private String ID = null;
     private String originalID = null;
+    private String clientID = null;
     private static int nextID = 1;
 
     public Order() {
         ID = generateID();
+        clientID = UUID.randomUUID().toString();
     }
 
     public Order(String ID) {
@@ -214,4 +217,6 @@ public class Order implements Cloneable {
     public String getOriginalID() {
         return originalID;
     }
+
+    public String getClientID() { return clientID;}
 }
