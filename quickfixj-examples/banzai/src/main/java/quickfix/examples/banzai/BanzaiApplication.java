@@ -372,6 +372,7 @@ public class BanzaiApplication implements Application {
         }
 
         newOrderSingle.setField(tifToFIXTif(order.getTIF()));
+        newOrderSingle.setField(new SecurityExchange(order.getSecurityExchange()));
         return newOrderSingle;
     }
 

@@ -80,6 +80,9 @@ public class OrderEntryPanel extends JPanel implements Observer {
     private final JLabel messageLabel = new JLabel(" ");
     private final JButton submitButton = new JButton("Submit");
 
+    private final JTextField exchangeTextField = new JTextField("bitmex");
+
+
     private OrderTableModel orderTableModel = null;
     private transient BanzaiApplication application = null;
 
@@ -158,6 +161,8 @@ public class OrderEntryPanel extends JPanel implements Observer {
         add(stopPriceTextField, ++x, y);
         tifComboBox.setName("TifComboBox");
         add(tifComboBox, ++x, y);
+        exchangeTextField.setName("Exchange");
+        add(exchangeTextField, ++x, y);
 
         constraints.insets = new Insets(3, 0, 0, 0);
         constraints.gridwidth = GridBagConstraints.RELATIVE;
@@ -253,6 +258,7 @@ public class OrderEntryPanel extends JPanel implements Observer {
             order.setSide((OrderSide) sideComboBox.getSelectedItem());
             order.setType((OrderType) typeComboBox.getSelectedItem());
             order.setTIF((OrderTIF) tifComboBox.getSelectedItem());
+            order.setSecurityExchange(exchangeTextField.getText());
 
             order.setSymbol(symbolTextField.getText());
             order.setQuantity(new BigDecimal(quantityTextField.getText()));

@@ -44,6 +44,7 @@ public class Order implements Cloneable {
     private String originalID = null;
     private String clientID = null;
     private static int nextID = 1;
+    private String securityExchange = null;
 
     public Order() {
         ID = generateID();
@@ -219,4 +220,12 @@ public class Order implements Cloneable {
     }
 
     public String getClientID() { return clientID;}
+
+    public String getSecurityExchange() {
+        return securityExchange;
+    }
+
+    public void setSecurityExchange(String securityExchange) {
+        this.securityExchange = securityExchange;
+    }
 }
