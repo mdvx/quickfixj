@@ -226,9 +226,9 @@ public class BanzaiApplication implements Application {
         execution.setExchangeID(sessionID + message.getField(new ExecID()).getValue());
 
         execution.setSymbol(message.getField(new Symbol()).getValue());
-        execution.setQuantity(fillSize.doubleValue());
+        execution.setQuantity(fillSize);
         if (message.isSetField(LastPx.FIELD)) {
-            execution.setPrice(Double.parseDouble(message.getString(LastPx.FIELD)));
+            execution.setPrice(new BigDecimal(message.getString(LastPx.FIELD)));
         }
         Side side = (Side) message.getField(new Side());
         execution.setSide(FIXSideToSide(side));

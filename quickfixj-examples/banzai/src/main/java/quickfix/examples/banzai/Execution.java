@@ -19,11 +19,13 @@
 
 package quickfix.examples.banzai;
 
+import java.math.BigDecimal;
+
 public class Execution {
     private String symbol = null;
-    private double quantity = 0;
+    private BigDecimal quantity = BigDecimal.ZERO;
     private OrderSide side = OrderSide.BUY;
-    private double price;
+    private BigDecimal price;
     private String ID = null;
     private String exchangeID = null;
     private String text = null;
@@ -45,11 +47,11 @@ public class Execution {
         this.symbol = symbol;
     }
 
-    public double getQuantity() {
+    public BigDecimal getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(double quantity) {
+    public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
     }
 
@@ -61,11 +63,11 @@ public class Execution {
         this.side = side;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
