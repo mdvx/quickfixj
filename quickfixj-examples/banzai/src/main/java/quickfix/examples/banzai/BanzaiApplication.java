@@ -170,9 +170,14 @@ public class BanzaiApplication implements Application {
         if (alreadyProcessed(execID, sessionID))
             return;
 
-        Order order = orderTableModel.getOrder(message.getField(new ClOrdID()).getValue());
+        String clOrdId = message.getString(ClOrdID.FIELD);
+        Order order = orderTableModel.getOrder(clOrdId);
         if (order == null) {
-            return;
+            order = new Order(clOrdId);
+            order.setSessionID(sessionID);
+            order.setSymbol( message.getString(Symbol.FIELD));
+            order.setQuantity( message.getDecimal(OrderQty.FIELD));
+            orderTableModel.addID(order, order.getID());
         }
 
         BigDecimal fillSize;
@@ -214,7 +219,7 @@ public class BanzaiApplication implements Application {
         } catch (FieldNotFound e) {
         }
 
-        orderTableModel.updateOrder(order, message.getField(new ClOrdID()).getValue());
+        orderTableModel.updateOrder(order, clOrdId);
         observableOrder.update(order);
 
         if (fillSize.compareTo(BigDecimal.ZERO) > 0) {
@@ -222,7 +227,7 @@ public class BanzaiApplication implements Application {
             execution.setExchangeID(sessionID + message.getField(new ExecID()).getValue());
 
             execution.setSymbol(message.getField(new Symbol()).getValue());
-            execution.setQuantity(fillSize.intValue());
+            execution.setQuantity(fillSize.doubleValue());
             if (message.isSetField(LastPx.FIELD)) {
                 execution.setPrice(Double.parseDouble(message.getString(LastPx.FIELD)));
             }

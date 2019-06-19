@@ -21,7 +21,7 @@ package quickfix.examples.banzai;
 
 public class Execution {
     private String symbol = null;
-    private int quantity = 0;
+    private double quantity = 0;
     private OrderSide side = OrderSide.BUY;
     private double price;
     private String ID = null;
@@ -44,11 +44,11 @@ public class Execution {
         this.symbol = symbol;
     }
 
-    public int getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(double quantity) {
         this.quantity = quantity;
     }
 
