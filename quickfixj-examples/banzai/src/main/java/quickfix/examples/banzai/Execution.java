@@ -26,6 +26,7 @@ public class Execution {
     private double price;
     private String ID = null;
     private String exchangeID = null;
+    private String text = null;
     private static int nextID = 1;
 
     public Execution() {
@@ -78,5 +79,13 @@ public class Execution {
 
     public String getExchangeID() {
         return exchangeID;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }

@@ -222,19 +222,24 @@ public class BanzaiApplication implements Application {
         orderTableModel.updateOrder(order, clOrdId);
         observableOrder.update(order);
 
-        if (fillSize.compareTo(BigDecimal.ZERO) > 0) {
-            Execution execution = new Execution();
-            execution.setExchangeID(sessionID + message.getField(new ExecID()).getValue());
+        Execution execution = new Execution();
+        execution.setExchangeID(sessionID + message.getField(new ExecID()).getValue());
 
-            execution.setSymbol(message.getField(new Symbol()).getValue());
-            execution.setQuantity(fillSize.doubleValue());
-            if (message.isSetField(LastPx.FIELD)) {
-                execution.setPrice(Double.parseDouble(message.getString(LastPx.FIELD)));
-            }
-            Side side = (Side) message.getField(new Side());
-            execution.setSide(FIXSideToSide(side));
-            executionTableModel.addExecution(execution);
+        execution.setSymbol(message.getField(new Symbol()).getValue());
+        execution.setQuantity(fillSize.doubleValue());
+        if (message.isSetField(LastPx.FIELD)) {
+            execution.setPrice(Double.parseDouble(message.getString(LastPx.FIELD)));
         }
+        Side side = (Side) message.getField(new Side());
+        execution.setSide(FIXSideToSide(side));
+
+        if (message.isSetField(SecurityExchange.FIELD))
+            execution.setExchangeID(message.getString(SecurityExchange.FIELD));
+
+        if (message.isSetField(Text.FIELD))
+            execution.setText(message.getString(Text.FIELD));
+
+        executionTableModel.addExecution(execution);
     }
 
     private void cancelReject(Message message, SessionID sessionID) throws FieldNotFound {
@@ -377,7 +382,13 @@ public class BanzaiApplication implements Application {
         }
 
         newOrderSingle.setField(tifToFIXTif(order.getTIF()));
-        newOrderSingle.setField(new SecurityExchange(order.getSecurityExchange()));
+        if (order.getSecurityExchange().length() > 0)
+            newOrderSingle.setField(new SecurityExchange(order.getSecurityExchange()));
+        else {
+            newOrderSingle.setField(new TargetStrategy(-07450));  // MB
+            newOrderSingle.setField(new TargetStrategyParameters("{ 'strategy': 'SOR' }"));  // SOR
+        }
+
         return newOrderSingle;
     }
 
