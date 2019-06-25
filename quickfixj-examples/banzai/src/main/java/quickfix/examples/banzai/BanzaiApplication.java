@@ -223,18 +223,21 @@ public class BanzaiApplication implements Application {
         observableOrder.update(order);
 
         Execution execution = new Execution();
-        execution.setExchangeID(sessionID + message.getField(new ExecID()).getValue());
-
+        execution.setExecID(sessionID + message.getField(new ExecID()).getValue());
         execution.setSymbol(message.getField(new Symbol()).getValue());
+
         execution.setQuantity(fillSize);
-        if (message.isSetField(LastPx.FIELD)) {
+        if (message.isSetField(LastPx.FIELD))
             execution.setPrice(new BigDecimal(message.getString(LastPx.FIELD)));
-        }
+
         Side side = (Side) message.getField(new Side());
         execution.setSide(FIXSideToSide(side));
 
+        if (message.isSetField(ExecID.FIELD))
+            execution.setExecID(message.getString(ExecID.FIELD));
+
         if (message.isSetField(SecurityExchange.FIELD))
-            execution.setExchangeID(message.getString(SecurityExchange.FIELD));
+            execution.setExchange(message.getString(SecurityExchange.FIELD));
 
         if (message.isSetField(Text.FIELD))
             execution.setText(message.getString(Text.FIELD));
@@ -365,7 +368,7 @@ public class BanzaiApplication implements Application {
 
         OrderType type = order.getType();
 
-        newOrderSingle.setField(new ClOrdID(order.getClientID()));
+        newOrderSingle.setField(new ClOrdID(order.getID()));
 
         if (type == OrderType.LIMIT)
             newOrderSingle.setField(new Price(order.getLimit()));
@@ -445,13 +448,13 @@ public class BanzaiApplication implements Application {
     public void cancel44(Order order) {
 
         quickfix.fix44.OrderCancelRequest message = new quickfix.fix44.OrderCancelRequest(
-                new OrigClOrdID(order.getID()), new ClOrdID(order.getClientID()),
+                new OrigClOrdID(order.getID()), new ClOrdID(order.getID()),
                 sideToFIXSide(order.getSide()), new TransactTime());
         message.setField(new OrderID(order.getID()));
         message.setField(new OrderQty(order.getQuantity().doubleValue()));
         message.setField(new Symbol(order.getSymbol()));
 
-        orderTableModel.addID(order, order.getClientID());
+        orderTableModel.addID(order, order.getID());
         send(message, order.getSessionID());
     }
 

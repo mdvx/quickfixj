@@ -28,8 +28,9 @@ public class ExecutionTableModel extends AbstractTableModel {
     private final static int QUANTITY = 1;
     private final static int SIDE = 2;
     private final static int PRICE = 3;
-    private final static int TEXT= 4;
-    private final static int EXCHANGE = 5;
+    private final static int TEXT = 4;
+    private final static int EXEC_ID = 5;
+    private final static int EXCHANGE = 6;
 
     private final HashMap<Integer, Execution> rowToExecution;
     private final HashMap<String, Integer> idToRow;
@@ -44,7 +45,7 @@ public class ExecutionTableModel extends AbstractTableModel {
         idToExecution = new HashMap<>();
         exchangeIdToExecution = new HashMap<>();
 
-        headers = new String[] {"Symbol", "Quantity", "Side", "Price", "Text", "Exchange"};
+        headers = new String[] {"Symbol", "Quantity", "Side", "Price", "Text", "ExecID", "Exchange"};
     }
 
     public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -54,13 +55,13 @@ public class ExecutionTableModel extends AbstractTableModel {
     public void addExecution(Execution execution) {
         int row = rowToExecution.size();
 
-        if (exchangeIdToExecution.get(execution.getExchangeID()) != null)
+        if (exchangeIdToExecution.get(execution.getExecID()) != null)
             return;
 
         rowToExecution.put(row, execution);
         idToRow.put(execution.getID(), row);
         idToExecution.put(execution.getID(), execution);
-        exchangeIdToExecution.put(execution.getExchangeID(), execution);
+        exchangeIdToExecution.put(execution.getExecID(), execution);
 
         fireTableRowsInserted(row, row);
     }
@@ -105,8 +106,10 @@ public class ExecutionTableModel extends AbstractTableModel {
             return execution.getPrice();
         case TEXT:
             return execution.getText();
+        case EXEC_ID:
+            return execution.getExecID();
         case EXCHANGE:
-            return execution.getExchangeID();
+            return execution.getExchange();
         }
         return "";
     }

@@ -42,13 +42,11 @@ public class Order implements Cloneable {
     private String message = null;
     private String ID = null;
     private String originalID = null;
-    private String clientID = null;
     private static int nextID = 1;
     private String securityExchange = null;
 
     public Order() {
         ID = generateID();
-        clientID = UUID.randomUUID().toString();
     }
 
     public Order(String ID) {
@@ -218,8 +216,6 @@ public class Order implements Cloneable {
     public String getOriginalID() {
         return originalID;
     }
-
-    public String getClientID() { return clientID;}
 
     public String getSecurityExchange() {
         return securityExchange;

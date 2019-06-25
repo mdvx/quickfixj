@@ -103,15 +103,14 @@ public class OrderEntryPanel extends JPanel implements Observer {
         stopPriceTextField.addKeyListener(activator);
         sessionComboBox.addItemListener(activator);
 
-
-
         setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
         setLayout(new GridBagLayout());
         createComponents();
 
         symbolTextField.setText("ETH/USD");
-        quantityTextField.setText("3");
-        limitPriceTextField.setText("100");
+        quantityTextField.setText("0.035");
+        limitPriceTextField.setText("350");
+        exchangeTextField.setText("coinbasepro");
     }
 
     public void addActionListener(ActionListener listener) {
