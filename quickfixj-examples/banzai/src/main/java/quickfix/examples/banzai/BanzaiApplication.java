@@ -388,8 +388,8 @@ public class BanzaiApplication implements Application {
         if (order.getSecurityExchange().length() > 0)
             newOrderSingle.setField(new SecurityExchange(order.getSecurityExchange()));
         else {
-            newOrderSingle.setField(new TargetStrategy(-07450));  // MB
-            newOrderSingle.setField(new TargetStrategyParameters("{ 'strategy': 'SOR' }"));  // SOR
+            newOrderSingle.setField(new TargetStrategy(-07450));  // 847
+            newOrderSingle.setField(new TargetStrategyParameters("{ 'strategy': 'SOR' }"));  // 848
         }
 
         return newOrderSingle;
