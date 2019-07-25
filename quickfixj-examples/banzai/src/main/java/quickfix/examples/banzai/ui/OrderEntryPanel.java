@@ -107,9 +107,9 @@ public class OrderEntryPanel extends JPanel implements Observer {
         setLayout(new GridBagLayout());
         createComponents();
 
-        symbolTextField.setText("ETH/USD");
-        quantityTextField.setText("0.035");
-        limitPriceTextField.setText("350");
+        symbolTextField.setText("LTC/USD");
+        quantityTextField.setText("0.1");
+        limitPriceTextField.setText("100");
         exchangeTextField.setText("coinbasepro");
     }
 
@@ -176,6 +176,7 @@ public class OrderEntryPanel extends JPanel implements Observer {
         typeComboBox.addItemListener(new PriceListener());
         typeComboBox.setSelectedItem(OrderType.STOP);
         typeComboBox.setSelectedItem(OrderType.MARKET);
+        typeComboBox.setSelectedItem(OrderType.LIMIT);
 
         Font font = new Font(messageLabel.getFont().getFontName(), Font.BOLD, 12);
         messageLabel.setFont(font);
