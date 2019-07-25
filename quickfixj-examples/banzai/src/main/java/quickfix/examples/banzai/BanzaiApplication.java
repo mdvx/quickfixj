@@ -239,6 +239,12 @@ public class BanzaiApplication implements Application {
         if (message.isSetField(SecurityExchange.FIELD))
             execution.setExchange(message.getString(SecurityExchange.FIELD));
 
+        if (message.isSetField(ClOrdID.FIELD))
+            execution.setClOrdId(message.getString(ClOrdID.FIELD));
+
+        if (message.isSetField(OrderID.FIELD))
+            execution.setID(message.getString(OrderID.FIELD));
+
         if (message.isSetField(Text.FIELD))
             execution.setText(message.getString(Text.FIELD));
 

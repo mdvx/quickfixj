@@ -28,13 +28,14 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class Execution {
-    private String symbol = null;
-    private BigDecimal quantity = BigDecimal.ZERO;
-    private OrderSide side = OrderSide.BUY;
+    private String symbol;
+    private BigDecimal quantity;
+    private OrderSide side;
     private BigDecimal price;
-    private String ID = null;
-    private String exchange = null;
-    private String execID = null;
-    private String text = null;
+    private String ID;
+    private String exchange;
+    private String execID;
+    private String text;
+    private String clOrdId;
     private static int nextID = 1;
 }
