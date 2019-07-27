@@ -107,7 +107,7 @@ public class OrderEntryPanel extends JPanel implements Observer {
         setLayout(new GridBagLayout());
         createComponents();
 
-        symbolTextField.setText("LTC/USD");
+        symbolTextField.setText("LTC-USD");
         quantityTextField.setText("0.1");
         limitPriceTextField.setText("100");
         exchangeTextField.setText("coinbasepro");

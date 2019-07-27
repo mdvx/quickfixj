@@ -16,6 +16,7 @@
 
 	<properties>
 		<mainClass>quickfix.examples.banzai.Banzai</mainClass>
+		<xchange.version>4.3.18</xchange.version>
 	</properties>
 
 	<dependencies>
@@ -24,6 +25,16 @@
 			<artifactId>lombok</artifactId>
 			<version>1.18.8</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.knowm.xchange</groupId>
+			<artifactId>xchange-core</artifactId>
+			<version>${xchange.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.knowm.xchange</groupId>
+			<artifactId>xchange-coinbasepro</artifactId>
+			<version>${xchange.version}</version>
 		</dependency>
 	</dependencies>
 

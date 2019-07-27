@@ -19,27 +19,23 @@
 
 package quickfix.examples.banzai;
 
-import quickfix.Application;
-import quickfix.DefaultMessageFactory;
-import quickfix.DoNotSend;
-import quickfix.FieldNotFound;
-import quickfix.FixVersions;
-import quickfix.IncorrectDataFormat;
-import quickfix.IncorrectTagValue;
-import quickfix.Message;
-import quickfix.RejectLogon;
-import quickfix.Session;
-import quickfix.SessionID;
-import quickfix.SessionNotFound;
-import quickfix.UnsupportedMessageType;
+import org.knowm.xchange.coinbasepro.service.CoinbaseProDigest;
+import quickfix.*;
 import quickfix.field.*;
 
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.swing.*;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Observable;
-import java.util.Observer;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.util.*;
 
 public class BanzaiApplication implements Application {
     private final DefaultMessageFactory messageFactory = new DefaultMessageFactory();
@@ -73,6 +69,58 @@ public class BanzaiApplication implements Application {
     }
 
     public void toAdmin(quickfix.Message message, SessionID sessionID) {
+        MsgType msgType = new MsgType();
+        MsgSeqNum msgSeqNum = new MsgSeqNum();
+        SendingTime sendingTime = new SendingTime();
+        SenderCompID senderCompID = new SenderCompID();
+        TargetCompID targetCompID = new TargetCompID();
+        Password passphrase = new Password("ppht398ss2");
+
+        String secretKeyBase64 = "llEzihglxB3oX/pbj028M4S6xP0l8a8czhcHmimgpNAZYvLuxTVFDfGhQd887YZ7BJkjD3gX0v9ICp6y/s9o+w==";
+
+        try {
+            /*
+                The Logon message sent by the client must be signed for security. The signing method is described in Signing
+                a Message. The prehash string is the following fields joined by the FIX field separator (ASCII code 1):
+
+                SendingTime, MsgType, MsgSeqNum, SenderCompID, TargetCompID, Password.
+
+                There is no trailing separator. The RawData field should be a base64 encoding of the HMAC signature.
+             */
+            if (message.getHeader().getField(msgType).valueEquals("A")) { // Logon Message
+                message.setField(passphrase);
+//                message.setField(new StringField(8013,"s"));
+//                message.setField(new StringField(9406,"Y"));
+
+                // Always sign
+//                LocalDateTime value = message.getHeader().getField(sendingTime).getValue();
+//                long mills = Timestamp.valueOf(value).getTime();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss.SSS");
+
+                String preSign = new StringBuilder()
+                        .append(message.getHeader().getField(sendingTime).getValue().format(formatter)).append('\001')
+                        .append(message.getHeader().getField(msgType).getValue()).append('\001')
+                        .append(message.getHeader().getField(msgSeqNum).getValue()).append('\001')
+                        .append(message.getHeader().getField(senderCompID).getValue()).append('\001')
+                        .append(message.getHeader().getField(targetCompID).getValue()).append('\001')
+                        .append("ppht398ss2")
+                        .toString();
+
+                final SecretKeySpec secretKeySpec = new SecretKeySpec(Base64.getDecoder().decode(secretKeyBase64), CoinbaseProDigest.HMAC_SHA_256);
+
+
+                Mac mac256 = Mac.getInstance(CoinbaseProDigest.HMAC_SHA_256);
+                mac256.init(secretKeySpec);
+
+                mac256.update(preSign.getBytes(StandardCharsets.US_ASCII));
+                String signature = Base64.getEncoder().encodeToString(mac256.doFinal());
+
+                message.setField(new RawData(signature));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void toApp(quickfix.Message message, SessionID sessionID) throws DoNotSend {
@@ -170,23 +218,31 @@ public class BanzaiApplication implements Application {
         if (alreadyProcessed(execID, sessionID))
             return;
 
-        String clOrdId = message.getString(ClOrdID.FIELD);
-        Order order = orderTableModel.getOrder(clOrdId);
-        if (order == null) {
-            order = new Order(clOrdId);
+        Order order = null;
+        if (message.isSetField(ClOrdID.FIELD)) {
+            String clOrdId = message.getString(ClOrdID.FIELD);
+            order = orderTableModel.getOrder(clOrdId);
+        }
+        else {
+            order = new Order();
             order.setSessionID(sessionID);
-            order.setSymbol( message.getString(Symbol.FIELD));
-            order.setQuantity( message.getDecimal(OrderQty.FIELD));
+
+            if (message.isSetField(Symbol.FIELD))
+                order.setSymbol(message.getString(Symbol.FIELD));
+
+            if (message.isSetField(OrderQty.FIELD))
+                order.setQuantity(message.getDecimal(OrderQty.FIELD));
+
             orderTableModel.addID(order, order.getID());
         }
 
-        BigDecimal fillSize;
+        BigDecimal fillSize = BigDecimal.ZERO;
 
         if (message.isSetField(LastShares.FIELD)) {
             LastShares lastShares = new LastShares();
             message.getField(lastShares);
             fillSize = new BigDecimal("" + lastShares.getValue());
-        } else {
+        } else if (message.isSetField(LeavesQty.FIELD)){
             // > FIX 4.1
             LeavesQty leavesQty = new LeavesQty();
             message.getField(leavesQty);
@@ -195,31 +251,35 @@ public class BanzaiApplication implements Application {
 
         if (fillSize.compareTo(BigDecimal.ZERO) > 0) {
             order.setOpen(order.getOpen().subtract(new BigDecimal(fillSize.toPlainString())));
-            order.setExecuted(Double.parseDouble(message.getString(CumQty.FIELD)));
-            order.setAvgPx(Double.parseDouble(message.getString(AvgPx.FIELD)));
+            if (message.isSetField(CumQty.FIELD))
+                order.setExecuted(Double.parseDouble(message.getString(CumQty.FIELD)));
+
+            if (message.isSetField(AvgPx.FIELD))
+                order.setAvgPx(Double.parseDouble(message.getString(AvgPx.FIELD)));
         }
 
-        OrdStatus ordStatus = (OrdStatus) message.getField(new OrdStatus());
+        if (message.isSetField(OrdStatus.FIELD)) {
+            OrdStatus ordStatus = (OrdStatus) message.getField(new OrdStatus());
 
-        if (ordStatus.valueEquals(OrdStatus.REJECTED)) {
-            order.setRejected(true);
-            order.setOpen(BigDecimal.ZERO);
-        } else if (ordStatus.valueEquals(OrdStatus.CANCELED)
-                || ordStatus.valueEquals(OrdStatus.DONE_FOR_DAY)) {
-            order.setCanceled(true);
-            order.setOpen(BigDecimal.ZERO);
-        } else if (ordStatus.valueEquals(OrdStatus.NEW)) {
-            if (order.isNew()) {
-                order.setNew(false);
+            if (ordStatus.valueEquals(OrdStatus.REJECTED)) {
+                order.setRejected(true);
+                order.setOpen(BigDecimal.ZERO);
+            } else if (ordStatus.valueEquals(OrdStatus.CANCELED)
+                    || ordStatus.valueEquals(OrdStatus.DONE_FOR_DAY)) {
+                order.setCanceled(true);
+                order.setOpen(BigDecimal.ZERO);
+            } else if (ordStatus.valueEquals(OrdStatus.NEW)) {
+                if (order.isNew()) {
+                    order.setNew(false);
+                }
             }
         }
 
-        try {
+        if (message.isSetField(Text.FIELD))
             order.setMessage(message.getField(new Text()).getValue());
-        } catch (FieldNotFound e) {
-        }
 
-        orderTableModel.updateOrder(order, clOrdId);
+
+        orderTableModel.updateOrder(order, order.getID());
         observableOrder.update(order);
 
         Execution execution = new Execution();
@@ -230,8 +290,8 @@ public class BanzaiApplication implements Application {
         if (message.isSetField(LastPx.FIELD))
             execution.setPrice(new BigDecimal(message.getString(LastPx.FIELD)));
 
-        Side side = (Side) message.getField(new Side());
-        execution.setSide(FIXSideToSide(side));
+        if (message.isSetField(Side.FIELD))
+            execution.setSide(FIXSideToSide((Side) message.getField(new Side())));
 
         if (message.isSetField(ExecID.FIELD))
             execution.setExecID(message.getString(ExecID.FIELD));
@@ -397,6 +457,8 @@ public class BanzaiApplication implements Application {
             newOrderSingle.setField(new TargetStrategy(-07450));  // 847
             newOrderSingle.setField(new TargetStrategyParameters("{ 'strategy': 'SOR' }"));  // 848
         }
+
+        newOrderSingle.setField(new TimeInForce(TimeInForce.GOOD_TILL_CANCEL));
 
         return newOrderSingle;
     }
