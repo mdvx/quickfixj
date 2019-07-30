@@ -103,7 +103,7 @@ public class BanzaiApplication implements Application {
                         .append(message.getHeader().getField(msgSeqNum).getValue()).append('\001')
                         .append(message.getHeader().getField(senderCompID).getValue()).append('\001')
                         .append(message.getHeader().getField(targetCompID).getValue()).append('\001')
-                        .append("ppht398ss2")
+                        .append(passphrase.getValue())
                         .toString();
 
                 final SecretKeySpec secretKeySpec = new SecretKeySpec(Base64.getDecoder().decode(secretKeyBase64), CoinbaseProDigest.HMAC_SHA_256);
