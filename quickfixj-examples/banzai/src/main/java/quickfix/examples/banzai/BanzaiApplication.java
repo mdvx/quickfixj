@@ -69,58 +69,6 @@ public class BanzaiApplication implements Application {
     }
 
     public void toAdmin(quickfix.Message message, SessionID sessionID) {
-        MsgType msgType = new MsgType();
-        MsgSeqNum msgSeqNum = new MsgSeqNum();
-        SendingTime sendingTime = new SendingTime();
-        SenderCompID senderCompID = new SenderCompID();
-        TargetCompID targetCompID = new TargetCompID();
-        Password passphrase = new Password("ppht398ss2");
-
-        String secretKeyBase64 = "llEzihglxB3oX/pbj028M4S6xP0l8a8czhcHmimgpNAZYvLuxTVFDfGhQd887YZ7BJkjD3gX0v9ICp6y/s9o+w==";
-
-        try {
-            /*
-                The Logon message sent by the client must be signed for security. The signing method is described in Signing
-                a Message. The prehash string is the following fields joined by the FIX field separator (ASCII code 1):
-
-                SendingTime, MsgType, MsgSeqNum, SenderCompID, TargetCompID, Password.
-
-                There is no trailing separator. The RawData field should be a base64 encoding of the HMAC signature.
-             */
-            if (message.getHeader().getField(msgType).valueEquals("A")) { // Logon Message
-                message.setField(passphrase);
-//                message.setField(new StringField(8013,"s"));
-//                message.setField(new StringField(9406,"Y"));
-
-                // Always sign
-//                LocalDateTime value = message.getHeader().getField(sendingTime).getValue();
-//                long mills = Timestamp.valueOf(value).getTime();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss.SSS");
-
-                String preSign = new StringBuilder()
-                        .append(message.getHeader().getField(sendingTime).getValue().format(formatter)).append('\001')
-                        .append(message.getHeader().getField(msgType).getValue()).append('\001')
-                        .append(message.getHeader().getField(msgSeqNum).getValue()).append('\001')
-                        .append(message.getHeader().getField(senderCompID).getValue()).append('\001')
-                        .append(message.getHeader().getField(targetCompID).getValue()).append('\001')
-                        .append(passphrase.getValue())
-                        .toString();
-
-                final SecretKeySpec secretKeySpec = new SecretKeySpec(Base64.getDecoder().decode(secretKeyBase64), CoinbaseProDigest.HMAC_SHA_256);
-
-
-                Mac mac256 = Mac.getInstance(CoinbaseProDigest.HMAC_SHA_256);
-                mac256.init(secretKeySpec);
-
-                mac256.update(preSign.getBytes(StandardCharsets.US_ASCII));
-                String signature = Base64.getEncoder().encodeToString(mac256.doFinal());
-
-                message.setField(new RawData(signature));
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void toApp(quickfix.Message message, SessionID sessionID) throws DoNotSend {
