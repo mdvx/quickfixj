@@ -194,7 +194,9 @@ public class BanzaiApplication implements Application {
             // > FIX 4.1
             LeavesQty leavesQty = new LeavesQty();
             message.getField(leavesQty);
-            fillSize = order.getQuantity().subtract(new BigDecimal("" + leavesQty.getValue()));
+            fillSize = order.getQuantity()
+                    .subtract(BigDecimal
+                            .valueOf(leavesQty.getValue()));
         }
 
         if (fillSize.compareTo(BigDecimal.ZERO) > 0) {
@@ -255,6 +257,12 @@ public class BanzaiApplication implements Application {
 
         if (message.isSetField(Text.FIELD))
             execution.setText(message.getString(Text.FIELD));
+
+        if (message.isSetField(OrdStatus.FIELD))
+            execution.setOrdStatus(message.getString(OrdStatus.FIELD));
+
+        if (message.isSetField(ExecType.FIELD))
+            execution.setExecType(message.getString(ExecType.FIELD));
 
         executionTableModel.addExecution(execution);
     }
@@ -362,6 +370,10 @@ public class BanzaiApplication implements Application {
         quickfix.fix44.NewOrderSingle newOrderSingle = new quickfix.fix44.NewOrderSingle(
                 new ClOrdID(order.getID()), sideToFIXSide(order.getSide()),
                 new TransactTime(), typeToFIXType(order.getType()));
+
+        if (order.getSide() == OrderSide.BUY && order.getType() == OrderType.MARKET)
+            newOrderSingle.set(new CashOrderQty(order.getQuantity().doubleValue()));
+
         newOrderSingle.set(new OrderQty(order.getQuantity().doubleValue()));
         newOrderSingle.set(new Symbol(order.getSymbol()));
         newOrderSingle.set(new HandlInst('1'));

@@ -26,13 +26,14 @@ public class ExecutionTableModel extends AbstractTableModel {
 
     private final static int SYMBOL = 0;
     private final static int QUANTITY = 1;
-    private final static int SIDE = 2;
+    private final static int ORD_STATUS = 2;  // SIDE
     private final static int PRICE = 3;
     private final static int TEXT = 4;
     private final static int EXEC_ID = 5;
     private final static int EXCHANGE = 6;
     private final static int ORDER_ID = 7;
     private final static int CL_ORD_ID = 8;
+    private final static int EXEC_TYPE = 9;
 
     private final HashMap<Integer, Execution> rowToExecution;
     private final HashMap<String, Integer> idToRow;
@@ -47,7 +48,7 @@ public class ExecutionTableModel extends AbstractTableModel {
         idToExecution = new HashMap<>();
         exchangeIdToExecution = new HashMap<>();
 
-        headers = new String[] {"Symbol", "Quantity", "Side", "Price", "Text", "ExecID", "Exchange", "ExchangeID", "clOrdID"};
+        headers = new String[] {"Symbol", "Quantity", "OrdStatus", "Price", "Text", "ExecID", "Exchange", "ExchangeID", "clOrdID", "ExecType"};
     }
 
     public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -98,24 +99,26 @@ public class ExecutionTableModel extends AbstractTableModel {
         Execution execution = rowToExecution.get(rowIndex);
 
         switch (columnIndex) {
-        case SYMBOL:
-            return execution.getSymbol();
-        case QUANTITY:
-            return execution.getQuantity();
-        case SIDE:
-            return execution.getSide();
-        case PRICE:
-            return execution.getPrice();
-        case TEXT:
-            return execution.getText();
-        case EXEC_ID:
-            return execution.getExecID();
-        case EXCHANGE:
-            return execution.getExchange();
-        case ORDER_ID:
-            return execution.getID();
-        case CL_ORD_ID:
-            return execution.getClOrdId();
+            case SYMBOL:
+                return execution.getSymbol();
+            case QUANTITY:
+                return execution.getQuantity();
+            case ORD_STATUS:
+                return execution.getOrdStatus();
+            case PRICE:
+                return execution.getPrice();
+            case TEXT:
+                return execution.getText();
+            case EXEC_ID:
+                return execution.getExecID();
+            case EXCHANGE:
+                return execution.getExchange();
+            case ORDER_ID:
+                return execution.getID();
+            case CL_ORD_ID:
+                return execution.getClOrdId();
+            case EXEC_TYPE:
+                return execution.getExecType();
         }
         return "";
     }
