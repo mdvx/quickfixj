@@ -19,40 +19,15 @@
 
 package quickfix.examples.banzai.ui;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import quickfix.SessionID;
+import quickfix.examples.banzai.*;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.math.BigDecimal;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.UUID;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-import quickfix.SessionID;
-import quickfix.examples.banzai.BanzaiApplication;
-import quickfix.examples.banzai.DoubleNumberTextField;
-import quickfix.examples.banzai.IntegerNumberTextField;
-import quickfix.examples.banzai.LogonEvent;
-import quickfix.examples.banzai.Order;
-import quickfix.examples.banzai.OrderSide;
-import quickfix.examples.banzai.OrderTIF;
-import quickfix.examples.banzai.OrderTableModel;
-import quickfix.examples.banzai.OrderType;
 
 @SuppressWarnings("unchecked")
 public class OrderEntryPanel extends JPanel implements Observer {
@@ -107,10 +82,10 @@ public class OrderEntryPanel extends JPanel implements Observer {
         setLayout(new GridBagLayout());
         createComponents();
 
-        symbolTextField.setText("LTC-USD");
-        quantityTextField.setText("0.1");
-        limitPriceTextField.setText("100");
-        exchangeTextField.setText("coinbasepro");
+        symbolTextField.setText("LTC-USDT");
+        quantityTextField.setText("0.16");
+        limitPriceTextField.setText("75");
+        exchangeTextField.setText("okex");
     }
 
     public void addActionListener(ActionListener listener) {

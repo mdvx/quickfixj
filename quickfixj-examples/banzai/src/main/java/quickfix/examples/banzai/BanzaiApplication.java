@@ -19,23 +19,15 @@
 
 package quickfix.examples.banzai;
 
-import org.knowm.xchange.coinbasepro.service.CoinbaseProDigest;
 import quickfix.*;
 import quickfix.field.*;
 
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.swing.*;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Observable;
+import java.util.Observer;
 
 public class BanzaiApplication implements Application {
     private final DefaultMessageFactory messageFactory = new DefaultMessageFactory();
@@ -171,7 +163,8 @@ public class BanzaiApplication implements Application {
             String clOrdId = message.getString(ClOrdID.FIELD);
             order = orderTableModel.getOrder(clOrdId);
         }
-        else {
+
+        if (order == null) {
             order = new Order();
             order.setSessionID(sessionID);
 
@@ -194,9 +187,12 @@ public class BanzaiApplication implements Application {
             // > FIX 4.1
             LeavesQty leavesQty = new LeavesQty();
             message.getField(leavesQty);
-            fillSize = order.getQuantity()
-                    .subtract(BigDecimal
-                            .valueOf(leavesQty.getValue()));
+
+            if (order.getQuantity() != null) {
+                fillSize = order.getQuantity()
+                        .subtract(BigDecimal
+                                .valueOf(leavesQty.getValue()));
+            }
         }
 
         if (fillSize.compareTo(BigDecimal.ZERO) > 0) {
@@ -373,8 +369,9 @@ public class BanzaiApplication implements Application {
 
         if (order.getSide() == OrderSide.BUY && order.getType() == OrderType.MARKET)
             newOrderSingle.set(new CashOrderQty(order.getQuantity().doubleValue()));
+        else
+            newOrderSingle.set(new OrderQty(order.getQuantity().doubleValue()));
 
-        newOrderSingle.set(new OrderQty(order.getQuantity().doubleValue()));
         newOrderSingle.set(new Symbol(order.getSymbol()));
         newOrderSingle.set(new HandlInst('1'));
         send(populateOrder(order, newOrderSingle), order.getSessionID());

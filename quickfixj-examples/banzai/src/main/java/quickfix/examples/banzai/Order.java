@@ -19,6 +19,7 @@
 
 package quickfix.examples.banzai;
 
+import lombok.Getter;
 import quickfix.SessionID;
 
 import java.math.BigDecimal;
@@ -28,6 +29,8 @@ public class Order implements Cloneable {
     private SessionID sessionID = null;
     private String symbol = null;
     private BigDecimal quantity = BigDecimal.ZERO;
+    @Getter
+    private BigDecimal notional = BigDecimal.ZERO;
     private BigDecimal open = BigDecimal.ZERO;
     private double executed = 0;
     private OrderSide side = OrderSide.BUY;
@@ -46,7 +49,7 @@ public class Order implements Cloneable {
     private String securityExchange = null;
 
     public Order() {
-        ID = generateID();
+        ID = Integer.toString(nextID++);
     }
 
     public Order(String ID) {
