@@ -412,7 +412,7 @@ public class BanzaiApplication implements Application {
             newOrderSingle.setField(new SecurityExchange(order.getSecurityExchange()));
         else {
             newOrderSingle.setField(new TargetStrategy(-07450));  // 847
-            newOrderSingle.setField(new TargetStrategyParameters("{ 'strategy': 'SOR' }"));  // 848
+            newOrderSingle.setField(new TargetStrategyParameters("SOR"));  // 848
         }
 
         newOrderSingle.setField(new TimeInForce(TimeInForce.GOOD_TILL_CANCEL));

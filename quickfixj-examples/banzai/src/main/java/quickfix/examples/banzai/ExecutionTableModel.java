@@ -48,7 +48,7 @@ public class ExecutionTableModel extends AbstractTableModel {
         idToExecution = new HashMap<>();
         exchangeIdToExecution = new HashMap<>();
 
-        headers = new String[] {"Symbol", "Quantity", "39=OrdStatus", "Price", "48=Text", "ExecID", "207=Exchange", "ExchangeID", "11=clOrdID", "150=ExecType"};
+        headers = new String[] {"Symbol", "38=OrdQty", "39=OrdStatus", "44=Price", "48=Text", "17=ExecID", "207=Exchange", "37=ExchangeID", "11=clOrdID", "150=ExecType"};
     }
 
     public boolean isCellEditable(int rowIndex, int columnIndex) {
