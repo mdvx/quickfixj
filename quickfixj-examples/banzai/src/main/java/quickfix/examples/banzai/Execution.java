@@ -19,10 +19,8 @@
 
 package quickfix.examples.banzai;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import quickfix.field.OrdStatus;
 
 import java.math.BigDecimal;
 
@@ -36,6 +34,7 @@ public class Execution {
     private BigDecimal price;
     private String ID;
     private String exchange;
+    private String strategy;
     private String execID;
     private String text;
     private String clOrdId;

@@ -34,6 +34,7 @@ public class ExecutionTableModel extends AbstractTableModel {
     private final static int ORDER_ID = 7;
     private final static int CL_ORD_ID = 8;
     private final static int EXEC_TYPE = 9;
+    private final static int STRATEGY = 10;
 
     private final HashMap<Integer, Execution> rowToExecution;
     private final HashMap<String, Integer> idToRow;
@@ -48,7 +49,7 @@ public class ExecutionTableModel extends AbstractTableModel {
         idToExecution = new HashMap<>();
         exchangeIdToExecution = new HashMap<>();
 
-        headers = new String[] {"Symbol", "38=OrdQty", "39=OrdStatus", "44=Price", "48=Text", "17=ExecID", "207=Exchange", "37=ExchangeID", "11=clOrdID", "150=ExecType"};
+        headers = new String[] {"Symbol", "38=OrdQty", "39=OrdStatus", "44=Price", "48=Text", "17=ExecID", "207=Exchange", "37=ExchangeID", "11=clOrdID", "150=ExecType","848=Strategy"};
     }
 
     public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -119,6 +120,8 @@ public class ExecutionTableModel extends AbstractTableModel {
                 return execution.getClOrdId();
             case EXEC_TYPE:
                 return execution.getExecType();
+            case STRATEGY:
+                return execution.getStrategy();
         }
         return "";
     }

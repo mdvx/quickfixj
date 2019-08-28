@@ -83,7 +83,7 @@ public class OrderEntryPanel extends JPanel implements Observer {
         createComponents();
 
         symbolTextField.setText("LTC-USDT");
-        quantityTextField.setText("0.16");
+        quantityTextField.setText("0.05");
         limitPriceTextField.setText("75");
         exchangeTextField.setText("okex");
     }
