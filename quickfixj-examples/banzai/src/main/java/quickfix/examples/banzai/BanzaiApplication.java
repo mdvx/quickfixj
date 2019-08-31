@@ -155,27 +155,27 @@ public class BanzaiApplication implements Application {
     private void executionReport(Message message, SessionID sessionID) throws FieldNotFound {
 
         ExecID execID = (ExecID) message.getField(new ExecID());
-        if (alreadyProcessed(execID, sessionID))
-            return;
+//        if (alreadyProcessed(execID, sessionID))
+//            return;
 
         Order order = null;
         if (message.isSetField(ClOrdID.FIELD)) {
             String clOrdId = message.getString(ClOrdID.FIELD);
             order = orderTableModel.getOrder(clOrdId);
+
+            if (order == null)
+                order = new Order(clOrdId);
         }
 
-        if (order == null) {
-            order = new Order();
-            order.setSessionID(sessionID);
+        order.setSessionID(sessionID);
 
-            if (message.isSetField(Symbol.FIELD))
-                order.setSymbol(message.getString(Symbol.FIELD));
+        if (message.isSetField(Symbol.FIELD))
+            order.setSymbol(message.getString(Symbol.FIELD));
 
-            if (message.isSetField(OrderQty.FIELD))
-                order.setQuantity(message.getDecimal(OrderQty.FIELD));
+        if (message.isSetField(OrderQty.FIELD))
+            order.setQuantity(message.getDecimal(OrderQty.FIELD));
 
-            orderTableModel.addID(order, order.getID());
-        }
+        orderTableModel.addID(order, order.getID());
 
         BigDecimal fillSize = BigDecimal.ZERO;
 
@@ -223,7 +223,6 @@ public class BanzaiApplication implements Application {
 
         if (message.isSetField(Text.FIELD))
             order.setMessage(message.getField(new Text()).getValue());
-
 
         orderTableModel.updateOrder(order, order.getID());
         observableOrder.update(order);

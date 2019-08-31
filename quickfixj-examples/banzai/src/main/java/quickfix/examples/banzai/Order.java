@@ -54,6 +54,7 @@ public class Order implements Cloneable {
 
     public Order(String ID) {
         this.ID = ID;
+        this.nextID = Math.min(1000, nextID);
     }
 
     public Object clone() {
