@@ -23,7 +23,6 @@ import lombok.Getter;
 import quickfix.SessionID;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 public class Order implements Cloneable {
     private SessionID sessionID = null;
@@ -49,12 +48,11 @@ public class Order implements Cloneable {
     private String securityExchange = null;
 
     public Order() {
-        ID = Integer.toString(nextID++);
+        ID = generateID();
     }
 
     public Order(String ID) {
         this.ID = ID;
-        this.nextID = Math.min(1000, nextID);
     }
 
     public Object clone() {
@@ -68,7 +66,7 @@ public class Order implements Cloneable {
     }
 
     public String generateID() {
-        return UUID.randomUUID().toString();
+        return Integer.toString(nextID++);
     }
 
     public SessionID getSessionID() {
